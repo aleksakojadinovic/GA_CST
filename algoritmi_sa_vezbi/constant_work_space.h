@@ -10,6 +10,8 @@
 
 #include <vector>
 #include <QPoint>
+#include <fstream>
+#include <iostream>
 
 class ConstantWorkSpace : public AlgoritamBaza
 {
@@ -19,13 +21,23 @@ public:
 
     void pokreniAlgoritam() final;
     void crtajAlgoritam(QPainter *) const final;
-    void pokreniNaivniAlgoritam() final {};
+    void pokreniNaivniAlgoritam() final{};
     void crtajNaivniAlgoritam(QPainter *) const final{};
 
-    void pokreniAlgoritamGrubeSile() {};
+    void pokreniAlgoritamGrubeSile(){};
+
+    void readFromFile(std::string fileName)
+    {
+        std::ifstream inputFile(fileName);
+        float x, y;
+        while (inputFile >> x >> y)
+        {
+            polygon.push_back(QPointF(x, y));
+        };
+    }
 
 private:
-    std::vector<QPoint> polygon;
+    std::vector<QPointF> polygon;
 };
 
 #endif

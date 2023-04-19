@@ -1,9 +1,10 @@
 #include "algoritambaza.h"
 #include <fstream>
+#include <iostream>
 
-void AlgoritamBaza::timerEvent(QTimerEvent */* unused */)
+void AlgoritamBaza::timerEvent(QTimerEvent * /* unused */)
 {
-     _semafor.release();
+    _semafor.release();
 }
 
 AlgoritamBaza::AlgoritamBaza(QWidget *pCrtanje, int pauzaKoraka, const bool &naivni)
@@ -11,7 +12,8 @@ AlgoritamBaza::AlgoritamBaza(QWidget *pCrtanje, int pauzaKoraka, const bool &nai
       _timerId{INVALID_TIMER_ID}, _semafor(0),
       _unistiAnimaciju(false), _pNit(nullptr),
       _pCrtanje{pCrtanje}, _naivni(naivni)
-{}
+{
+}
 
 bool AlgoritamBaza::naivni() const
 {
@@ -79,7 +81,8 @@ void AlgoritamBaza::promeniDuzinuPauze(int duzinaPauze)
 
 bool AlgoritamBaza::updateCanvasAndBlock()
 {
-    if (_pCrtanje) {
+    if (_pCrtanje)
+    {
         _pCrtanje->update();
         _semafor.acquire();
     }
@@ -108,10 +111,13 @@ std::vector<QPoint> AlgoritamBaza::generisiNasumicneTacke(int brojTacaka) const
 
     std::vector<QPoint> randomPoints;
 
-    int xDiff = xMax-xMin;
-    int yDiff = yMax-yMin;
-    for(int i=0; i < brojTacaka; i++)
-        randomPoints.emplace_back(xMin + rand()%xDiff, yMin + rand()%yDiff);
+    int xDiff = xMax - xMin;
+    int yDiff = yMax - yMin;
+
+    std::cerr << "xmax" << xMax << "ymax" << yMax << "xmin" << xMin << "ymin" << yMin << std::endl;
+
+    for (int i = 0; i < brojTacaka; i++)
+        randomPoints.emplace_back(xMin + rand() % xDiff, yMin + rand() % yDiff);
 
     return randomPoints;
 }
@@ -121,7 +127,7 @@ std::vector<QPoint> AlgoritamBaza::ucitajPodatkeIzDatoteke(std::string imeDatote
     std::ifstream inputFile(imeDatoteke);
     std::vector<QPoint> points;
     int x, y;
-    while(inputFile >> x >> y)
+    while (inputFile >> x >> y)
         points.emplace_back(x, y);
     return points;
 }

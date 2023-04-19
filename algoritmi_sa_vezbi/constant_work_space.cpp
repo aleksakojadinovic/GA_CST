@@ -4,20 +4,17 @@
 ConstantWorkSpace::ConstantWorkSpace(QWidget *qw,
                                      int deltaT,
                                      const bool &naiive,
-                                     std::string fileName="",
-                                     int numObjects=NUM_RANDOM)
+                                     std::string fileName = "",
+                                     int numObjects = NUM_RANDOM)
     : AlgoritamBaza(qw, deltaT, naiive)
 {
     if (fileName == "")
     {
-        polygon = generisiNasumicneTacke(numObjects);
     }
-
-    // generisiNasumicnePravougaonike(brojPravougaonika);
     else
     {
-        ucitajPodatkeIzDatoteke(fileName);
-    };
+        readFromFile(fileName);
+    }
 }
 
 void ConstantWorkSpace::pokreniAlgoritam()
@@ -28,12 +25,14 @@ void ConstantWorkSpace::pokreniAlgoritam()
 
 void ConstantWorkSpace::crtajAlgoritam(QPainter *painter) const
 {
-    std::cerr << "ima li nas" << std::endl;
     const auto N = polygon.size();
+    std::cerr << "asdasdsa" << std::endl;
     for (int i = 0; i < N; i++)
     {
         const auto p1 = polygon[i];
         const auto p2 = polygon[(i + 1) % N];
+
+        std::cerr << p1.x() << std::endl;
 
         painter->drawPoint(p1);
         painter->drawPoint(p2);
