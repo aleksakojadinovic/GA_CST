@@ -734,6 +734,11 @@
            </item>
            <item>
             <property name="text">
+             <string>Constant Work Space</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
              <string>STUDENTSKI PROJEKTI</string>
             </property>
            </item>

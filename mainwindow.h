@@ -17,11 +17,13 @@
 #include "./algoritmi_sa_vezbi/ga05_preseciduzi.h"
 #include "./algoritmi_sa_vezbi/ga06_dceldemo.h"
 #include "./algoritmi_sa_vezbi/ga07_triangulation.h"
+#include "./algoritmi_sa_vezbi/constant_work_space.h"
 
-//#include "ga06_presekPravougaonika.h"
+// #include "ga06_presekPravougaonika.h"
 
 /* Enumeracija algoritama */
-enum class TipAlgoritma {
+enum class TipAlgoritma
+{
     ALGORITMI_SA_VEZBI,
     DEMO_ISCRTAVANJA,
     BRISUCA_PRAVA,
@@ -33,18 +35,23 @@ enum class TipAlgoritma {
     TRIANGULACIJA,
     SEPARATOR,
     STUDENTSKI_PROJEKTI,
-    PRESEK_PRAVOUGAONIKA
+    PRESEK_PRAVOUGAONIKA,
+    CONSTANT_WORK_SPACE
 };
 
 /* Enumeracija tabova */
-enum TabIndex {
+enum TabIndex
+{
     ALGORITAM_2D,
     ALGORITAM_3D,
     POREDJENJE
 };
 
 QT_BEGIN_NAMESPACE
-namespace Ui { class MainWindow; }
+namespace Ui
+{
+    class MainWindow;
+}
 QT_END_NAMESPACE
 
 class MainWindow : public QMainWindow

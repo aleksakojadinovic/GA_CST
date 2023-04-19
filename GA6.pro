@@ -19,6 +19,7 @@ SOURCES += \
     algoritmi_sa_vezbi/ga06_dcel.cpp \
     algoritmi_sa_vezbi/ga06_dceldemo.cpp \
     algoritmi_sa_vezbi/ga07_triangulation.cpp \
+    algoritmi_sa_vezbi/constant_work_space.cpp \
     algoritmi_studentski_projekti/ga06_presekPravougaonika.cpp \
     animacijanit.cpp \
     main.cpp \
@@ -42,6 +43,7 @@ HEADERS += \
     algoritmi_sa_vezbi/ga06_dceldemo.h \
     algoritmi_sa_vezbi/ga07_datastructures.h \
     algoritmi_sa_vezbi/ga07_triangulation.h \
+    algoritmi_sa_vezbi/constant_work_space.h \
     algoritmi_studentski_projekti/ga06_presekPravougaonika.h \
     animacijanit.h \
     config.h \

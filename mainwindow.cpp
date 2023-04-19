@@ -13,7 +13,7 @@ MainWindow::MainWindow(QWidget *parent)
       _brojSlucajnihObjekata(BROJ_SLUCAJNIH_OBJEKATA)
 {
     ui->setupUi(this);
-    ui->tipAlgoritma->insertSeparator(static_cast<int>(TipAlgoritma::SEPARATOR));
+    // ui->tipAlgoritma->insertSeparator(static_cast<int>(TipAlgoritma::CONSTANT_WORK_SPACE));
     animacijaButtonAktivni(false);
     animacijaParametriButtonAktivni(true);
     _naivni = ui->naivniCheck->isChecked();
@@ -30,12 +30,13 @@ MainWindow::MainWindow(QWidget *parent)
     connect(_pOblastCrtanja, &OblastCrtanja::polozajKursora,
             this, &MainWindow::on_polozajKursora);
     connect(ui->tabWidget, &QTabWidget::currentChanged,
-            this, [this](int) {ui->statusBar->showMessage("");});
+            this, [this](int)
+            { ui->statusBar->showMessage(""); });
 
     /* Add chart */
     QChart *chart = new QChart();
-    _optimalSeries->append(0,0);
-    _naiveSeries->append(0,0);
+    _optimalSeries->append(0, 0);
+    _naiveSeries->append(0, 0);
 
     _optimalSeries->setName("Optimalni algoritam");
     _naiveSeries->setName("Naivni algoritam");
@@ -89,7 +90,7 @@ void MainWindow::animacijaParametriButtonAktivni(bool param_aktivnosti)
 void MainWindow::on_datoteka_dugme_clicked()
 {
     QString imeDatoteke = QFileDialog::getOpenFileName(this,
-                              tr("Datoteka sa koordinatama tacaka"), "./ulazni_podaci/", "*.*");
+                                                       tr("Datoteka sa koordinatama tacaka"), "./ulazni_podaci/", "*.*");
     if (imeDatoteke.isEmpty())
         return;
 
@@ -105,7 +106,7 @@ void MainWindow::on_datoteka_dugme_clicked()
 void MainWindow::on_Nasumicni_dugme_clicked()
 {
     _imeDatoteke = "";
-    if (ui->brojNasumicniTacaka->text() != "" )
+    if (ui->brojNasumicniTacaka->text() != "")
         _brojSlucajnihObjekata = ui->brojNasumicniTacaka->text().toInt();
 
     napraviNoviAlgoritam();
@@ -115,7 +116,7 @@ void MainWindow::on_Nasumicni_dugme_clicked()
 
 void MainWindow::on_Ponisti_dugme_clicked()
 {
-    ui->tipAlgoritma->setCurrentIndex(0);
+    ui->tipAlgoritma->setCurrentIndex(10);
     animacijaButtonAktivni(false);
     animacijaParametriButtonAktivni(true);
 
@@ -201,14 +202,15 @@ void MainWindow::on_tipAlgoritma_currentIndexChanged(int index)
             ui->merenjeButton->setEnabled(false);
         }
 
-        switch (tipAlgoritma) {
+        switch (tipAlgoritma)
+        {
         /* DCEL ne podrzava rad sa nasumicnim tackama */
         case TipAlgoritma::DCEL_DEMO:
             ui->Nasumicni_dugme->setEnabled(false);
             ui->merenjeButton->setEnabled(false);
 
-        /* DCEL i naredni nemaju naivne algoritme */
-        [[clang::fallthrough]];
+            /* DCEL i naredni nemaju naivne algoritme */
+            [[clang::fallthrough]];
         case TipAlgoritma::DEMO_ISCRTAVANJA:
         case TipAlgoritma::BRISUCA_PRAVA:
         case TipAlgoritma::_3D_ISCRTAVANJE:
@@ -226,7 +228,9 @@ void MainWindow::on_tipAlgoritma_currentIndexChanged(int index)
             tipAlgoritma == TipAlgoritma::KONVEKSNI_OMOTAC_3D)
         {
             ui->tabWidget->setCurrentIndex(TabIndex::ALGORITAM_3D);
-        } else {
+        }
+        else
+        {
             ui->tabWidget->setCurrentIndex(TabIndex::ALGORITAM_2D);
         }
     }
@@ -277,7 +281,8 @@ void MainWindow::napraviNoviAlgoritam()
     /* Ovde se kreiraju instance algoritama pozivom njihovih konstruktora. Svi
        2D algoritmi crtaju po _pOblastCrtanja, a 3D po _pOblastCrtanjaOpenGL. */
     TipAlgoritma tipAlgoritma = static_cast<TipAlgoritma>(ui->tipAlgoritma->currentIndex());
-    switch (tipAlgoritma) {
+    switch (tipAlgoritma)
+    {
     case TipAlgoritma::DEMO_ISCRTAVANJA:
         _pAlgoritamBaza = new DemoIscrtavanja(_pOblastCrtanja, _duzinaPauze, _naivni,
                                               _imeDatoteke, _brojSlucajnihObjekata);
@@ -310,10 +315,14 @@ void MainWindow::napraviNoviAlgoritam()
         _pAlgoritamBaza = new Triangulation(_pOblastCrtanja, _duzinaPauze, _naivni,
                                             _imeDatoteke, _brojSlucajnihObjekata);
         break;
-   /* case TipAlgoritma::PRESEK_PRAVOUGAONIKA:
-        _pAlgoritamBaza = new PresekPravougaonika(_pOblastCrtanja, _duzinaPauze, _naivni,
-                                                  _imeDatoteke, _brojSlucajnihObjekata);
-        break;*/
+    case TipAlgoritma::CONSTANT_WORK_SPACE:
+        _pAlgoritamBaza = new ConstantWorkSpace(_pOblastCrtanja, _duzinaPauze, _naivni,
+                                                _imeDatoteke, _brojSlucajnihObjekata);
+        break;
+        /* case TipAlgoritma::PRESEK_PRAVOUGAONIKA:
+             _pAlgoritamBaza = new PresekPravougaonika(_pOblastCrtanja, _duzinaPauze, _naivni,
+                                                       _imeDatoteke, _brojSlucajnihObjekata);
+             break;*/
     default: /* ako nije algoritam uopste */
         break;
     }
