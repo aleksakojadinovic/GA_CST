@@ -1,4 +1,5 @@
 #include "constant_work_space.h"
+#include <iostream>
 
 ConstantWorkSpace::ConstantWorkSpace(QWidget *qw,
                                      int deltaT,
@@ -27,6 +28,7 @@ void ConstantWorkSpace::pokreniAlgoritam()
 
 void ConstantWorkSpace::crtajAlgoritam(QPainter *painter) const
 {
+    std::cerr << "ima li nas" << std::endl;
     const auto N = polygon.size();
     for (int i = 0; i < N; i++)
     {

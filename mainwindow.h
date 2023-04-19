@@ -25,6 +25,7 @@
 enum class TipAlgoritma
 {
     ALGORITMI_SA_VEZBI,
+    CONSTANT_WORK_SPACE,
     DEMO_ISCRTAVANJA,
     BRISUCA_PRAVA,
     _3D_ISCRTAVANJE,
@@ -35,8 +36,7 @@ enum class TipAlgoritma
     TRIANGULACIJA,
     SEPARATOR,
     STUDENTSKI_PROJEKTI,
-    PRESEK_PRAVOUGAONIKA,
-    CONSTANT_WORK_SPACE
+    PRESEK_PRAVOUGAONIKA
 };
 
 /* Enumeracija tabova */
