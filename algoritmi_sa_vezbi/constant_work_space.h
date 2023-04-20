@@ -34,7 +34,6 @@ public:
         float x, y;
         while (inputFile >> x >> y)
         {
-            std::cerr << "adding point" << std::endl;
             polygon.push_back(QPointF(x, y));
         };
         std::cerr << polygon.size() << std::endl;
@@ -44,7 +43,8 @@ public:
 
 private:
     std::vector<QPointF> polygon;
-    QPointF qidisplay;
+    QPointF qi_display;
+    std::pair<QPointF, QPointF> qi_edges_display;
 };
 
 #endif
