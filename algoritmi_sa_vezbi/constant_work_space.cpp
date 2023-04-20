@@ -113,6 +113,8 @@ void ConstantWorkSpace::pokreniAlgoritam()
             qi_minus_1 = qi;
             continue;
         }
+
+        qi_minus_1 = qi;
     }
 
     emit finishAnimation;
