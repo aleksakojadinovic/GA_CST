@@ -26,6 +26,8 @@ public:
 
     void pokreniAlgoritamGrubeSile(){};
 
+    int getLeftMostPointIndex(int fromIndex);
+
     void readFromFile(std::string fileName)
     {
         std::ifstream inputFile(fileName);
@@ -42,6 +44,7 @@ public:
 
 private:
     std::vector<QPointF> polygon;
+    QPointF qidisplay;
 };
 
 #endif
