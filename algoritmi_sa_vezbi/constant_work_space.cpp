@@ -101,21 +101,18 @@ void ConstantWorkSpace::pokreniAlgoritam()
         qi_edges_display = std::pair<QPointF, QPointF>(qi_before, qi_after);
         AlgoritamBaza_updateCanvasAndBlock();
 
-
         // . This happens precisely if at least one of
         // the two edges incident to qi has an endpoint to the right of qi
         // Meaning either qi_before and qi_after is to the right of qi
 
         auto hasTrapezoidToTheRight = qi_before.x() > qi.x() || qi_after.x() > qi.x();
 
-        if (!hasTrapezoidToTheRight){
+        if (!hasTrapezoidToTheRight)
+        {
             // Early return
             qi_minus_1 = qi;
             continue;
         }
-
-
-        
     }
 
     emit finishAnimation;
