@@ -10,6 +10,7 @@
 
 namespace pomocneFunkcije {
 int povrsinaTrougla(const QPoint& A, const QPoint& B, const QPoint& C);
+float povrsinaTrouglaF(const QPointF& A, const QPointF& B, const QPointF& C);
 int distanceKvadrat(const QPoint& A, const QPoint& B);
 bool presekDuzi(const QLineF& l1, const QLineF& l2, QPointF& presek);
 double distanceKvadratF(const QPointF& A, const QPointF& B);

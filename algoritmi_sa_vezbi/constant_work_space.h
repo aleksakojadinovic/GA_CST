@@ -32,9 +32,13 @@ public:
         float x, y;
         while (inputFile >> x >> y)
         {
+            std::cerr << "adding point" << std::endl;
             polygon.push_back(QPointF(x, y));
         };
+        std::cerr << polygon.size() << std::endl;
     }
+
+    void preparePoints();
 
 private:
     std::vector<QPointF> polygon;
