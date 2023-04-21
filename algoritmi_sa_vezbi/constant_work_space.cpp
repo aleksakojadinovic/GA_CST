@@ -171,6 +171,16 @@ void ConstantWorkSpace::pokreniAlgoritam()
             eB_display = eB;
         }
 
+        if (ea_initialized && eb_initialized){
+            // r = the leftmost of the right endpoints of ea and eb
+            auto eA_right = eA.p1().x() > eA.p2().x() ? eA.p1() : eA.p2();
+            auto eB_right = eB.p1().x() > eB.p2().x() ? eB.p1() : eB.p2();
+
+            auto r = eA_right.x() < eB_right.x() ? eA_right : eB_right;
+
+            trapezoids.push_back({qi, eA, eB, r });
+        }
+
         AlgoritamBaza_updateCanvasAndBlock();
 
         qi_minus_1 = qi;

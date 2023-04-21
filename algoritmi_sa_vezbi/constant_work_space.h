@@ -43,6 +43,8 @@ public:
 
 private:
     std::vector<QPointF> polygon;
+    std::vector<std::tuple<QPointF, QLineF, QLineF, QPointF>> trapezoids;
+
     QPointF qi_display;
     std::pair<QPointF, QPointF> qi_edges_display;
     QLineF qi_ray_display;
