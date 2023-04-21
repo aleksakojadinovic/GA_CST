@@ -47,7 +47,7 @@ private:
     std::pair<QPointF, QPointF> qi_edges_display;
     QLineF qi_ray_display;
     QLineF eA_display;
-    
+    QLineF eB_display;
 };
 
 #endif

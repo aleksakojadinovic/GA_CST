@@ -89,7 +89,7 @@ void ConstantWorkSpace::pokreniAlgoritam()
         // std::cerr << "qi is " << qi.x() << " , " << qi.y() << ", at index" << qi_index << " and its edges go to " << qi_before.x() << ", " << qi_before.y() << " and " << qi_after.x() << ", " << qi_after.y() << " which are at indices " << before_index << " and " << after_index << std::endl;
 
         qi_edges_display = std::pair<QPointF, QPointF>(qi_before, qi_after);
-        
+
         // . This happens precisely if at least one of
         // the two edges incident to qi has an endpoint to the right of qi
         // Meaning either qi_before and qi_after is to the right of qi
@@ -103,16 +103,14 @@ void ConstantWorkSpace::pokreniAlgoritam()
             continue;
         }
 
-        // If the test is positive, we first compute two polygon edges: eA just above qi and eB just below qi. 
+        // If the test is positive, we first compute two polygon edges: eA just above qi and eB just below qi.
         // This is done by traversing all of P. Here, an edge e is above qi if it intersects the upward vertical ray from qi
-        // ,or, in case that e is incident to qi, if e has an endpoint to the right of qi and the interior of the polygon lies below e. 
+        // ,or, in case that e is incident to qi, if e has an endpoint to the right of qi and the interior of the polygon lies below e.
         // An edge e being below qi is defined analogously
 
-        // Represents the upward vertical ray from the point qi 
-        QLineF ray(qi, QPointF(qi.x(), qi.y() + 2000));
+        // Represents the upward vertical ray from the point qi
+        QLineF ray(QPointF(qi.x(), qi.y() - 1000), QPointF(qi.x(), qi.y() + 2000));
         qi_ray_display = ray;
-
-        AlgoritamBaza_updateCanvasAndBlock();
 
         // We need to find an edge that is immediately above qi, meaning ray intersection + closest
         QLineF eA;
@@ -122,40 +120,58 @@ void ConstantWorkSpace::pokreniAlgoritam()
         QPointF ray_intersection;
         bool ea_initialized = false;
         bool eb_initialized = false;
-        for (auto i = 0; i < polygon.size(); i++) {
+        for (auto i = 0; i < polygon.size(); i++)
+        {
             auto p1 = polygon[i];
             auto p2 = polygon[(i + 1) % N];
 
-            if (i == qi_index || (i + 1) % N == qi_index) {
+            if (i == qi_index || (i + 1) % N == qi_index)
+            {
                 // Special case where the edge is incident
-            }else{
-                
+            }
+            else
+            {
+
                 // Does the edge intersect the upward vertical ray from qi?//  case where the edge is not incident
                 auto result = ray.intersect(QLineF(p1, p2), &ray_intersection);
-                if (result != QLineF::IntersectType::BoundedIntersection) {
+
+                auto has_intersection = result != QLineF::IntersectType::NoIntersection && std::min(p1.x(), p2.x()) < ray_intersection.x() && ray_intersection.x() < std::max(p1.x(), p2.x());
+                if (!has_intersection)
+                {
                     // No intersection
                     continue;
                 }
-                if (ray_intersection.y() > qi.y()) {
-                    std::cerr << "they intersect at y=" << ray_intersection.y() << " and current qi is at " << qi.y() << std::endl;
-                    // Candidate for eA
-                    // And now we minimize y
-                    if (!ea_initialized || ray_intersection.y() < eA_y) {
+                if (ray_intersection.y() > qi.y())
+                {
+
+                    if (!ea_initialized || ray_intersection.y() < eA_y)
+                    {
                         ea_initialized = true;
                         eA_y = ray_intersection.y();
                         eA = QLineF(p1, p2);
                     }
                 }
-                if (ray_intersection.y() < qi.y()) {
-                    // candidate for eB
-                    // And now me maximize y
+                if (ray_intersection.y() < qi.y())
+                {
+                    if (!eb_initialized || ray_intersection.y() > eB_y)
+                    {
+                        eb_initialized = true;
+                        eB_y = ray_intersection.y();
+                        eB = QLineF(p1, p2);
+                    }
                 }
-                
-                
             }
         }
+        if (ea_initialized)
+        {
+            eA_display = eA;
+        }
+        if (eb_initialized)
+        {
+            eB_display = eB;
+        }
 
-        eA_display = eA;
+        AlgoritamBaza_updateCanvasAndBlock();
 
         qi_minus_1 = qi;
     }
@@ -214,16 +230,27 @@ void ConstantWorkSpace::crtajAlgoritam(QPainter *painter) const
     // painter->setPen(pen);
     // painter->drawLine(qi_display, qi_edges_display.second);
 
-    // Draw upward ray from qi
+
+    // Draw ray from qi
     pen.setColor(Qt::black);
-    pen.setWidth(10);
+    pen.setWidth(5);
+    pen.setStyle(Qt::DashLine);
     painter->setPen(pen);
     painter->drawLine(qi_ray_display);
 
     // Draw eA
     pen.setColor(Qt::yellow);
+    pen.setWidth(5);
+    pen.setStyle(Qt::SolidLine);
     painter->setPen(pen);
     painter->drawLine(eA_display);
+
+    // Draw eB
+    pen.setColor(Qt::cyan);
+    pen.setWidth(5);
+    pen.setStyle(Qt::SolidLine);
+    painter->setPen(pen);
+    painter->drawLine(eB_display);
 }
 
 void ConstantWorkSpace::preparePoints()
