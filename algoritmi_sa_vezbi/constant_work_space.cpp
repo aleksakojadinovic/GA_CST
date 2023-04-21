@@ -18,6 +18,11 @@ ConstantWorkSpace::ConstantWorkSpace(QWidget *qw,
         readFromFile(fileName);
     }
     preparePoints();
+    for (int i = 0; i < 20; i++)
+    {
+        QColor color(qrand() % 256, qrand() % 256, qrand() % 256);
+        colors.push_back(color);
+    }
 }
 
 int ConstantWorkSpace::getLeftMostPointIndex(int fromIndex)
@@ -171,14 +176,16 @@ void ConstantWorkSpace::pokreniAlgoritam()
             eB_display = eB;
         }
 
-        if (ea_initialized && eb_initialized){
+        if (ea_initialized && eb_initialized)
+        {
             // r = the leftmost of the right endpoints of ea and eb
             auto eA_right = eA.p1().x() > eA.p2().x() ? eA.p1() : eA.p2();
             auto eB_right = eB.p1().x() > eB.p2().x() ? eB.p1() : eB.p2();
 
             auto r = eA_right.x() < eB_right.x() ? eA_right : eB_right;
 
-            trapezoids.push_back({qi, eA, eB, r });
+            // TODO: This is still incomplete but I will visualize just in case
+            trapezoids.push_back({qi, eA, eB, r});
         }
 
         AlgoritamBaza_updateCanvasAndBlock();
@@ -240,7 +247,6 @@ void ConstantWorkSpace::crtajAlgoritam(QPainter *painter) const
     // painter->setPen(pen);
     // painter->drawLine(qi_display, qi_edges_display.second);
 
-
     // Draw ray from qi
     pen.setColor(Qt::black);
     pen.setWidth(5);
@@ -261,6 +267,41 @@ void ConstantWorkSpace::crtajAlgoritam(QPainter *painter) const
     pen.setStyle(Qt::SolidLine);
     painter->setPen(pen);
     painter->drawLine(eB_display);
+
+    // Draw trapezoids
+    for (auto i = 0; i < trapezoids.size(); i++)
+    {
+        auto t = trapezoids[i];
+        auto qi = std::get<0>(t);
+        auto eA = std::get<1>(t);
+        auto eB = std::get<2>(t);
+        auto r = std::get<3>(t);
+
+        // Find intersects
+        QPointF intersect1;
+        QPointF intersect2;
+
+        QLineF ray(QPointF(qi.x(), qi.y() + 2000), QPointF(qi.x(), qi.y() - 2000));
+        ray.intersect(eA, &intersect1);
+        ray.intersect(eB, &intersect2);
+        auto t_vector = QVector<QPointF>();
+        t_vector.push_back(QPointF(intersect1));
+        t_vector.push_back(QPointF(intersect2));
+
+        ray = QLineF(QPointF(r.x(), r.y() + 2000), QPointF(r.x(), r.y() - 2000));
+        ray.intersect(eA, &intersect1);
+        ray.intersect(eB, &intersect2);
+        t_vector.push_back(QPointF(intersect2));
+        t_vector.push_back(QPointF(intersect1));
+
+        auto color = colors[i & 20];
+        QBrush b(color);
+        pen.setColor(Qt::black);
+        painter->setPen(pen);
+        painter->setBrush(b);
+        painter->drawPolygon(QPolygonF(t_vector));
+
+    }
 }
 
 void ConstantWorkSpace::preparePoints()
