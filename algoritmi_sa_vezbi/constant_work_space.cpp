@@ -31,6 +31,28 @@ int ConstantWorkSpace::getLeftMostPointIndex(int fromIndex)
     return 0;
 }
 
+QPolygonF ConstantWorkSpace::resolveTrapezoidPoints(QPointF qi, QLineF eA, QLineF eB, QPointF r)
+{
+    // Find intersects
+    QPointF intersect1;
+    QPointF intersect2;
+
+    QLineF ray(QPointF(qi.x(), qi.y() + 2000), QPointF(qi.x(), qi.y() - 2000));
+    ray.intersect(eA, &intersect1);
+    ray.intersect(eB, &intersect2);
+    auto t_vector = QVector<QPointF>();
+    t_vector.push_back(QPointF(intersect1));
+    t_vector.push_back(QPointF(intersect2));
+
+    ray = QLineF(QPointF(r.x(), r.y() + 2000), QPointF(r.x(), r.y() - 2000));
+    ray.intersect(eA, &intersect1);
+    ray.intersect(eB, &intersect2);
+    t_vector.push_back(QPointF(intersect2));
+    t_vector.push_back(QPointF(intersect1));
+
+    return QPolygonF(t_vector);
+}
+
 void ConstantWorkSpace::pokreniAlgoritam()
 {
     // for (auto i = 0; i < polygon.size(); i++)
@@ -185,7 +207,31 @@ void ConstantWorkSpace::pokreniAlgoritam()
             auto r = eA_right.x() < eB_right.x() ? eA_right : eB_right;
 
             // TODO: This is still incomplete but I will visualize just in case
-            trapezoids.push_back({qi, eA, eB, r});
+
+            auto initial_trapezoid = resolveTrapezoidPoints(qi, eA, eB, r);
+            QPointF replacement_point;
+            bool replacement_initialized = false;
+            for (auto p: polygon) {
+                if (p.x() <= qi.x()) {
+                    continue;
+                }
+                if (!initial_trapezoid.containsPoint(p, Qt::OddEvenFill)) {
+                    continue;
+                }
+                if (!replacement_initialized || p.x() < replacement_point.x()){
+                    replacement_initialized = true;
+                    replacement_point = p;
+                }
+            }
+            if (replacement_initialized) {
+                replacement_display_visible = true;
+                replacement_display = replacement_point;
+            }else{
+                replacement_display_visible = false;
+            }
+            auto r_resolved = replacement_initialized ? replacement_point : r;
+            auto final_trapezoid = resolveTrapezoidPoints(qi, eA, eB, r_resolved);
+            trapezoids.push_back(final_trapezoid);
         }
 
         AlgoritamBaza_updateCanvasAndBlock();
@@ -272,35 +318,13 @@ void ConstantWorkSpace::crtajAlgoritam(QPainter *painter) const
     for (auto i = 0; i < trapezoids.size(); i++)
     {
         auto t = trapezoids[i];
-        auto qi = std::get<0>(t);
-        auto eA = std::get<1>(t);
-        auto eB = std::get<2>(t);
-        auto r = std::get<3>(t);
-
-        // Find intersects
-        QPointF intersect1;
-        QPointF intersect2;
-
-        QLineF ray(QPointF(qi.x(), qi.y() + 2000), QPointF(qi.x(), qi.y() - 2000));
-        ray.intersect(eA, &intersect1);
-        ray.intersect(eB, &intersect2);
-        auto t_vector = QVector<QPointF>();
-        t_vector.push_back(QPointF(intersect1));
-        t_vector.push_back(QPointF(intersect2));
-
-        ray = QLineF(QPointF(r.x(), r.y() + 2000), QPointF(r.x(), r.y() - 2000));
-        ray.intersect(eA, &intersect1);
-        ray.intersect(eB, &intersect2);
-        t_vector.push_back(QPointF(intersect2));
-        t_vector.push_back(QPointF(intersect1));
-
+        
         auto color = colors[i & 20];
         QBrush b(color);
         pen.setColor(Qt::black);
         painter->setPen(pen);
         painter->setBrush(b);
-        painter->drawPolygon(QPolygonF(t_vector));
-
+        painter->drawPolygon(t);
     }
 }
 

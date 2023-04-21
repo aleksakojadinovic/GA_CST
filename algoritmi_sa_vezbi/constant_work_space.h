@@ -41,11 +41,16 @@ public:
 
     void preparePoints();
 
+    QPolygonF resolveTrapezoidPoints(QPointF, QLineF, QLineF, QPointF);
+
 private:
     std::vector<QPointF> polygon;
-    std::vector<std::tuple<QPointF, QLineF, QLineF, QPointF>> trapezoids;
+    std::vector<QPolygonF> trapezoids;
 
     std::vector<QColor> colors;
+
+    QPointF replacement_display;
+    bool replacement_display_visible;
 
     QPointF qi_display;
     std::pair<QPointF, QPointF> qi_edges_display;
