@@ -45,6 +45,9 @@ private:
     std::vector<QPointF> polygon;
     QPointF qi_display;
     std::pair<QPointF, QPointF> qi_edges_display;
+    QLineF qi_ray_display;
+    QLineF eA_display;
+    
 };
 
 #endif
