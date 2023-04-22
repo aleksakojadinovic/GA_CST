@@ -41,7 +41,12 @@ public:
 
     void preparePoints();
 
+    bool findEdgeAbove(int pointIndex, int*result);
+
     QPolygonF resolveTrapezoidPoints(QPointF, QLineF, QLineF, QPointF);
+    bool isInteriorBelowLine(QLineF);
+
+    std::string ptos(QPointF p);
 
 private:
     std::vector<QPointF> polygon;
@@ -51,6 +56,9 @@ private:
 
     QPointF replacement_display;
     bool replacement_display_visible;
+
+    bool ea_initialized_display;
+    bool eb_initialized_display;
 
     QPointF qi_display;
     std::pair<QPointF, QPointF> qi_edges_display;
