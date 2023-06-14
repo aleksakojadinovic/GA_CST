@@ -164,7 +164,6 @@ DIST          = docs/ga06_presekPravougaonika.docx \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/qt_config.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++/qmake.conf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_post.prf \
-		.qmake.stash \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/exclusive_builds.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/toolchain.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/default_pre.prf \
@@ -291,7 +290,6 @@ Makefile: GA6.pro /usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++/qmake.conf /us
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/qt_config.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++/qmake.conf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_post.prf \
-		.qmake.stash \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/exclusive_builds.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/toolchain.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/default_pre.prf \
@@ -369,7 +367,6 @@ Makefile: GA6.pro /usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++/qmake.conf /us
 /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/qt_config.prf:
 /usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++/qmake.conf:
 /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_post.prf:
-.qmake.stash:
 /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/exclusive_builds.prf:
 /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/toolchain.prf:
 /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/default_pre.prf:
@@ -591,7 +588,8 @@ ga07_triangulation.o: algoritmi_sa_vezbi/ga07_triangulation.cpp algoritmi_sa_vez
 constant_work_space.o: algoritmi_sa_vezbi/constant_work_space.cpp algoritmi_sa_vezbi/constant_work_space.h \
 		algoritambaza.h \
 		animacijanit.h \
-		config.h
+		config.h \
+		pomocnefunkcije.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o constant_work_space.o algoritmi_sa_vezbi/constant_work_space.cpp
 
 ga06_presekPravougaonika.o: algoritmi_studentski_projekti/ga06_presekPravougaonika.cpp algoritmi_studentski_projekti/ga06_presekPravougaonika.h \
