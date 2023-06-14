@@ -13,6 +13,8 @@
 #include <fstream>
 #include <iostream>
 
+#include <optional>
+
 class ConstantWorkSpace : public AlgoritamBaza
 {
 public:
@@ -41,12 +43,13 @@ public:
 
     void preparePoints();
 
-    bool findEdgeAbove(int pointIndex, int*result);
+    bool findEdgeAbove(int pointIndex, int *result);
 
     QPolygonF resolveTrapezoidPoints(QPointF, QLineF, QLineF, QPointF);
     bool isInteriorBelowLine(QLineF);
 
     std::string ptos(QPointF p);
+    bool getBindingEdges(const std::vector<QPointF> &polygon, const QPointF &point, QLineF *upperEdge, QLineF *lowerEdge);
 
 private:
     std::vector<QPointF> polygon;

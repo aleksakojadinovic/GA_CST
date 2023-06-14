@@ -58,6 +58,53 @@ bool ConstantWorkSpace::isInteriorBelowLine(QLineF line)
     // This will be true if
 }
 
+bool ConstantWorkSpace::getBindingEdges(const std::vector<QPointF> &polygon, const QPointF &point, QLineF *upperEdge, QLineF *lowerEdge)
+{
+    bool upperFound = false;
+    bool lowerFound = false;
+    qreal upperMinDist = std::numeric_limits<qreal>::max();
+    qreal lowerMinDist = std::numeric_limits<qreal>::max();
+    QPointF intersection;
+
+    for (size_t i = 0; i < polygon.size(); ++i)
+    {
+        QPointF p1 = polygon[i];
+        QPointF p2 = polygon[(i + 1) % polygon.size()];
+
+        // Create a line
+        QLineF line(p1, p2);
+
+
+        std::cerr << "Line: " << p1.x() << "," << p1.y() << " --> " << p2.x() << ", " << p2.y() << std::endl;
+
+        // auto intersectionResult = QLineF(point, QPointF(point.x(), -10000)).intersect(line, &intersection);
+        {
+            std::cerr << "ive intersected something on lower" << std::endl;
+            qreal dist = point.y() - p1.y();
+            if (intersection.y() <= point.y() && (!lowerFound || dist < lowerMinDist))
+            {
+                *lowerEdge = line;
+                lowerMinDist = dist;
+                lowerFound = true;
+            }
+        }
+
+        if (QLineF(point, QPointF(point.x(), 10000)).intersect(line, &intersection) == QLineF::BoundedIntersection)
+        {
+            std::cerr << "ive intersected something on upper" << std::endl;
+            qreal dist = p1.y() - point.y();
+            if (intersection.y() > point.y() && (!upperFound || dist < upperMinDist))
+            {
+                *upperEdge = line;
+                upperMinDist = dist;
+                upperFound = true;
+            }
+        }
+    }
+
+    return upperFound && lowerFound;
+}
+
 void ConstantWorkSpace::pokreniAlgoritam()
 {
     // for (auto i = 0; i < polygon.size(); i++)
@@ -102,103 +149,23 @@ void ConstantWorkSpace::pokreniAlgoritam()
             }
         }
 
-        QLineF ray = QLineF(QPointF(qi.x(), qi.y() - 1000), QPointF(qi.x(), qi.y() + 200));
-
-        bool ea_initialized = false;
-        bool eb_initialized = false;
         QLineF eA;
         QLineF eB;
-        QPointF eA_intersect_point;
-        QPointF eB_intersect_point;
 
-        for (auto i = 0; i < polygon.size(); i++)
+        auto edgesFound = getBindingEdges(polygon, qi, &eA, &eB);
+
+        if (edgesFound)
         {
-            auto p1_index = i;
-            auto p2_index = (i + 1) % N;
-            auto p1 = polygon[p1_index];
-            auto p2 = polygon[p2_index];
-
-            auto edge_left_x = std::min(p1.x(), p2.x());
-            auto edge_right_x = std::max(p1.x(), p2.x());
-            auto edge_down_y = std::min(p1.y(), p2.y());
-            auto edge_up_y = std::max(p1.y(), p2.y());
-
-            auto eA_up_y = std::max(eA.p1().y(), eA.p2().y());
-            auto eB_down_y = std::min(eB.p1().y(), eB.p2().y());
-
-            auto has_endpoint_to_the_right = edge_right_x > qi.x();
-
-            auto has_endpoint_to_the_up = edge_up_y > qi.y();
-            auto has_endpoint_to_the_down = edge_down_y < qi.y();
-
-            auto candidate_edge = QLineF(p1, p2);
-
-            QPointF intersection_point;
-            auto intersection_indicator = ray.intersect(candidate_edge, &intersection_point);
-
-            auto has_intersection = intersection_indicator != QLineF::IntersectType::NoIntersection && edge_left_x <= intersection_point.x() && intersection_point.x() <= edge_right_x;
-
-            float intersect_y = intersection_point.y();
-
-            auto should_consider_for_ea = has_intersection && intersect_y >= qi.y() && has_endpoint_to_the_right && has_endpoint_to_the_up;
-            auto should_consider_for_eb = has_intersection && intersect_y <= qi.y() && has_endpoint_to_the_right && has_endpoint_to_the_down;
-
-            //  Handle initial cases (bcz im lazy as fukkkkk)
-            if (should_consider_for_ea)
-            {
-
-                if (intersection_point.y() < eA_intersect_point.y() || (intersection_point.y() == eA_intersect_point.y() && edge_up_y < eA_up_y || !ea_initialized))
-                {
-                    ea_initialized = true;
-                    eA_intersect_point = QPointF(intersection_point);
-                    eA = candidate_edge;
-                }
-            }
-
-            if (should_consider_for_eb)
-            {
-                if (intersection_point.y() > eB_intersect_point.y() || (intersection_point.y() == eB_intersect_point.y() && edge_down_y > eB_down_y || !eb_initialized))
-                {
-                    eb_initialized = true;
-                    eB_intersect_point = QPointF(intersection_point);
-                    eB = candidate_edge;
-                }
-            }
+            eA_display = eA;
+            eB_display = eB;
+        }else{
+            std::cerr << "Not found :(" << std::endl;
         }
 
-        if (ea_initialized && eb_initialized)
-        {
-            auto ea_right_point = eA.p1().x() > eA.p2().x() ? eA.p1() : eA.p2();
-            auto eb_right_point = eB.p1().x() > eB.p2().x() ? eB.p1() : eB.p2();
+        // qi_ray_display = ray;
 
-            auto initial_r = ea_right_point.x() < eb_right_point.x() ? ea_right_point : eb_right_point;
-
-            auto initial_trapezoid = resolveTrapezoidPoints(qi, eA, eB, initial_r);
-
-            bool replacement_initialized = false;
-            QPointF replacement;
-
-            for (auto inside_point: polygon) {
-                if (!initial_trapezoid.containsPoint(inside_point, Qt::OddEvenFill)) {
-                    continue;
-                }
-
-                if (!replacement_initialized || inside_point.x() < replacement.x()) {
-                    replacement_initialized = true;
-                    replacement = QPointF(inside_point);
-                }
-            }
-            auto new_r = replacement_initialized ? replacement : initial_r;
-            auto final_trapezoid = resolveTrapezoidPoints(qi, eA, eB, new_r);
-
-            trapezoids.push_back(final_trapezoid);
-
-        }
-
-        eA_display = eA;
-        eB_display = eB;
-        qi_ray_display = ray;
         qi_display = qi;
+        qi_ray_display = QLineF(QPointF(qi.x(), -1000), QPointF(qi.x(), 100000));
         AlgoritamBaza_updateCanvasAndBlock();
 
         qi_minus_1 = qi;
