@@ -78,6 +78,7 @@ bool ConstantWorkSpace::getBindingEdges(const std::vector<QPointF> &polygon, con
         std::cerr << "Line: " << p1.x() << "," << p1.y() << " --> " << p2.x() << ", " << p2.y() << std::endl;
 
         // auto intersectionResult = QLineF(point, QPointF(point.x(), -10000)).intersect(line, &intersection);
+        if (QLineF(point, QPointF(point.x(), -10000)).intersect(line, &intersection) == QLineF::BoundedIntersection)
         {
             std::cerr << "ive intersected something on lower" << std::endl;
             qreal dist = point.y() - p1.y();
