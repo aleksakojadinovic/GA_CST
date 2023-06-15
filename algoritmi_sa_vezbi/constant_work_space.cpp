@@ -157,9 +157,13 @@ void ConstantWorkSpace::pokreniAlgoritam()
 
         if (edgesFound)
         {
+            ea_initialized_display = true;
+            eb_initialized_display = true;
             eA_display = eA;
             eB_display = eB;
         }else{
+            ea_initialized_display = false;
+            ea_initialized_display = false;
             std::cerr << "Not found :(" << std::endl;
         }
 
