@@ -58,7 +58,7 @@ bool ConstantWorkSpace::isInteriorBelowLine(QLineF line)
     // This will be true if
 }
 
-void ConstantWorkSpace::find_biding_edge(int qi_index, bool * is_found, QLineF * edge, bool is_upper) {
+void ConstantWorkSpace::find_biding_edge(int qi_index, bool * is_found, QLineF * edge, bool is_upper, int * edge_start_index) {
 
     auto orientation = [](QPointF p, QPointF q, QPointF r) {
         return (q.y() - p.y()) * (r.x() - q.x()) - (q.x() - p.x()) * (r.y() - q.y());
@@ -102,16 +102,28 @@ void ConstantWorkSpace::find_biding_edge(int qi_index, bool * is_found, QLineF *
             // 2) Does the interior of the polygon lie below/above the line
             // The interior is below iff the next point ccw order is below the edge
             // THEORY: qi_next needs to be different from p1 or p2
-            auto qi_next_index = (qi_index + 1) % polygon.size();
 
-            auto o = orientation(edge_p1, edge_p2, polygon[qi_next_index]);
-
-            if (is_upper && orientation < 0) {
+            if (candidate_edge.dx() == 0) {
                 continue;
             }
-            if (!is_upper && orientation > 0) {
+
+            if (is_upper && (candidate_edge.dy() / candidate_edge.dx())  < 0) {
                 continue;
-            }   
+            }
+
+            if (!is_upper && (candidate_edge.dy() / candidate_edge.dx())  > 0) {
+                continue;
+            }
+            // auto qi_next_index = (qi_index + 1) % polygon.size();
+
+            // auto o = orientation(edge_p1, edge_p2, polygon[qi_next_index]);
+
+            // if (is_upper && orientation < 0) {
+            //     continue;
+            // }
+            // if (!is_upper && orientation > 0) {
+            //     continue;
+            // }   
         }
 
         // Now we know this point should be considered
@@ -121,6 +133,7 @@ void ConstantWorkSpace::find_biding_edge(int qi_index, bool * is_found, QLineF *
             *is_found = true;
             *edge = candidate_edge;
             best_intersection_y = intersection.y();
+            *edge_start_index = i;
         }
 
 
@@ -182,8 +195,14 @@ void ConstantWorkSpace::pokreniAlgoritam()
         QPointF eA_intersect_point;
         QPointF eB_intersect_point;
 
-        find_biding_edge(qi_index, &ea_initialized, &eA, true);
-        find_biding_edge(qi_index, &eb_initialized, &eB, false);
+
+        int eA_start_index;
+        int eB_start_index;
+
+        find_biding_edge(qi_index, &ea_initialized, &eA, true, &eA_start_index);
+        find_biding_edge(qi_index, &eb_initialized, &eB, false, &eB_start_index);
+
+
 
         // for (auto i = 0; i < polygon.size(); i++)
         // {
@@ -244,6 +263,7 @@ void ConstantWorkSpace::pokreniAlgoritam()
 
         if (ea_initialized && eb_initialized)
         {
+            std::cerr << "ea index" << eA_start_index << ", eb index " << eB_start_index << std::endl; 
             auto ea_right_point = eA.p1().x() > eA.p2().x() ? eA.p1() : eA.p2();
             auto eb_right_point = eB.p1().x() > eB.p2().x() ? eB.p1() : eB.p2();
 
@@ -366,7 +386,7 @@ void ConstantWorkSpace::crtajAlgoritam(QPainter *painter) const
     // Draw replacement point
     if (replacement_display_visible)
     {
-        std::cerr << "no replacement here" << std::endl;
+        // std::cerr << "no replacement here" << std::endl;
         pen.setColor(Qt::gray);
         pen.setWidth(15);
         painter->setPen(pen);
