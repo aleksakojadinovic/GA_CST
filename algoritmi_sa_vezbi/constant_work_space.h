@@ -48,6 +48,8 @@ public:
 
     std::string ptos(QPointF p);
 
+    void find_biding_edge(int qi_index, bool * is_found, QLineF * edge, bool is_upper);
+
 private:
     std::vector<QPointF> polygon;
     std::vector<QPolygonF> trapezoids;

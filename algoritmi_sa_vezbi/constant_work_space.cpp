@@ -58,6 +58,77 @@ bool ConstantWorkSpace::isInteriorBelowLine(QLineF line)
     // This will be true if
 }
 
+void ConstantWorkSpace::find_biding_edge(int qi_index, bool * is_found, QLineF * edge, bool is_upper) {
+
+    auto orientation = [](QPointF p, QPointF q, QPointF r) {
+        return (q.y() - p.y()) * (r.x() - q.x()) - (q.x() - p.x()) * (r.y() - q.y());
+    };
+
+
+    float best_intersection_y = is_upper ? -100000 : 100000;
+    QPointF point = polygon[qi_index];
+
+    *is_found = false;
+
+    QLineF ray(point, QPointF(point.x(), is_upper ? 10000 : -10000));
+
+    for (int i = 0; i < polygon.size(); i++){
+        auto edge_p1 = polygon[i];
+        auto edge_p2 = polygon[(i + 1) % polygon.size()];
+
+        auto candidate_edge = QLineF(edge_p1, edge_p2);
+
+        // Check for intersection
+
+        QPointF intersection;
+
+        auto intersection_result = ray.intersect(candidate_edge, &intersection);
+
+        if (intersection_result != QLineF::IntersectType::BoundedIntersection) {
+            continue;
+        }
+
+        // handle incident edge
+
+        if (qi_index == i || qi_index == (i + 1) % polygon.size()) {
+            // handle incident edge
+
+            // 1) edge needs to have an endpoint to the right of qi
+            auto edge_max_right = std::max(edge_p1.x(), edge_p2.x());
+            if (edge_max_right <= point.x()) {
+                continue;
+            }
+
+            // 2) Does the interior of the polygon lie below/above the line
+            // The interior is below iff the next point ccw order is below the edge
+            // THEORY: qi_next needs to be different from p1 or p2
+            auto qi_next_index = (qi_index + 1) % polygon.size();
+
+            auto o = orientation(edge_p1, edge_p2, polygon[qi_next_index]);
+
+            if (is_upper && orientation < 0) {
+                continue;
+            }
+            if (!is_upper && orientation > 0) {
+                continue;
+            }   
+        }
+
+        // Now we know this point should be considered
+
+
+        if (!(*is_found) || ((is_upper && intersection.y() < best_intersection_y) || (!is_upper && intersection.y() > best_intersection_y))) {
+            *is_found = true;
+            *edge = candidate_edge;
+            best_intersection_y = intersection.y();
+        }
+
+
+
+    }
+
+}
+
 void ConstantWorkSpace::pokreniAlgoritam()
 {
     // for (auto i = 0; i < polygon.size(); i++)
@@ -102,7 +173,7 @@ void ConstantWorkSpace::pokreniAlgoritam()
             }
         }
 
-        QLineF ray = QLineF(QPointF(qi.x(), qi.y() - 1000), QPointF(qi.x(), qi.y() + 200));
+        QLineF ray = QLineF(QPointF(qi.x(), qi.y() - 10000), QPointF(qi.x(), qi.y() + 10000));
 
         bool ea_initialized = false;
         bool eb_initialized = false;
@@ -111,60 +182,65 @@ void ConstantWorkSpace::pokreniAlgoritam()
         QPointF eA_intersect_point;
         QPointF eB_intersect_point;
 
-        for (auto i = 0; i < polygon.size(); i++)
-        {
-            auto p1_index = i;
-            auto p2_index = (i + 1) % N;
-            auto p1 = polygon[p1_index];
-            auto p2 = polygon[p2_index];
+        find_biding_edge(qi_index, &ea_initialized, &eA, true);
+        find_biding_edge(qi_index, &eb_initialized, &eB, false);
 
-            auto edge_left_x = std::min(p1.x(), p2.x());
-            auto edge_right_x = std::max(p1.x(), p2.x());
-            auto edge_down_y = std::min(p1.y(), p2.y());
-            auto edge_up_y = std::max(p1.y(), p2.y());
+        // for (auto i = 0; i < polygon.size(); i++)
+        // {
+        //     auto p1_index = i;
+        //     auto p2_index = (i + 1) % N;
+        //     auto p1 = polygon[p1_index];
+        //     auto p2 = polygon[p2_index];
 
-            auto eA_up_y = std::max(eA.p1().y(), eA.p2().y());
-            auto eB_down_y = std::min(eB.p1().y(), eB.p2().y());
+        //     auto edge_left_x = std::min(p1.x(), p2.x());
+        //     auto edge_right_x = std::max(p1.x(), p2.x());
+        //     auto edge_down_y = std::min(p1.y(), p2.y());
+        //     auto edge_up_y = std::max(p1.y(), p2.y());
 
-            auto has_endpoint_to_the_right = edge_right_x > qi.x();
+        //     auto eA_up_y = std::max(eA.p1().y(), eA.p2().y());
+        //     auto eB_down_y = std::min(eB.p1().y(), eB.p2().y());
 
-            auto has_endpoint_to_the_up = edge_up_y > qi.y();
-            auto has_endpoint_to_the_down = edge_down_y < qi.y();
+        //     auto has_endpoint_to_the_right = edge_right_x > qi.x();
 
-            auto candidate_edge = QLineF(p1, p2);
+        //     auto has_endpoint_to_the_up = edge_up_y > qi.y();
+        //     auto has_endpoint_to_the_down = edge_down_y < qi.y();
 
-            QPointF intersection_point;
-            auto intersection_indicator = ray.intersect(candidate_edge, &intersection_point);
+        //     auto candidate_edge = QLineF(p1, p2);
 
-            auto has_intersection = intersection_indicator != QLineF::IntersectType::NoIntersection && edge_left_x <= intersection_point.x() && intersection_point.x() <= edge_right_x;
+        //     auto is_incident_edge = qi_index == p1_index || qi_index == p2_index;
 
-            float intersect_y = intersection_point.y();
+        //     QPointF intersection_point;
+        //     auto intersection_indicator = ray.intersect(candidate_edge, &intersection_point);
 
-            auto should_consider_for_ea = has_intersection && intersect_y >= qi.y() && has_endpoint_to_the_right && has_endpoint_to_the_up;
-            auto should_consider_for_eb = has_intersection && intersect_y <= qi.y() && has_endpoint_to_the_right && has_endpoint_to_the_down;
+        //     auto has_intersection = intersection_indicator != QLineF::IntersectType::NoIntersection && edge_left_x <= intersection_point.x() && intersection_point.x() <= edge_right_x;
 
-            //  Handle initial cases (bcz im lazy as fukkkkk)
-            if (should_consider_for_ea)
-            {
+        //     float intersect_y = intersection_point.y();
 
-                if (intersection_point.y() < eA_intersect_point.y() || (intersection_point.y() == eA_intersect_point.y() && edge_up_y < eA_up_y || !ea_initialized))
-                {
-                    ea_initialized = true;
-                    eA_intersect_point = QPointF(intersection_point);
-                    eA = candidate_edge;
-                }
-            }
+        //     auto should_consider_for_ea = has_intersection && intersect_y >= qi.y() && has_endpoint_to_the_right; /* && has_endpoint_to_the_up;*/
+        //     auto should_consider_for_eb = has_intersection && intersect_y <= qi.y() && has_endpoint_to_the_right; /*&& has_endpoint_to_the_down; */
 
-            if (should_consider_for_eb)
-            {
-                if (intersection_point.y() > eB_intersect_point.y() || (intersection_point.y() == eB_intersect_point.y() && edge_down_y > eB_down_y || !eb_initialized))
-                {
-                    eb_initialized = true;
-                    eB_intersect_point = QPointF(intersection_point);
-                    eB = candidate_edge;
-                }
-            }
-        }
+        //     //  Handle initial cases (bcz im lazy as fukkkkk)
+        //     if (should_consider_for_ea)
+        //     {
+
+        //         if (intersection_point.y() < eA_intersect_point.y() || (intersection_point.y() == eA_intersect_point.y() && edge_up_y < eA_up_y || !ea_initialized))
+        //         {
+        //             ea_initialized = true;
+        //             eA_intersect_point = QPointF(intersection_point);
+        //             eA = candidate_edge;
+        //         }
+        //     }
+
+        //     if (should_consider_for_eb)
+        //     {
+        //         if (intersection_point.y() > eB_intersect_point.y() || (intersection_point.y() == eB_intersect_point.y() && edge_down_y > eB_down_y || !eb_initialized))
+        //         {
+        //             eb_initialized = true;
+        //             eB_intersect_point = QPointF(intersection_point);
+        //             eB = candidate_edge;
+        //         }
+        //     }
+        // }
 
         if (ea_initialized && eb_initialized)
         {
