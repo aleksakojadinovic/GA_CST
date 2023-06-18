@@ -107,15 +107,16 @@ void ConstantWorkSpace::find_biding_edge(int qi_index, bool *is_found, QLineF *e
                 continue;
             }
 
-            // 2) Does the interior of the polygon lie below/above the line
-            // The interior is below iff the next point ccw order is below the edge
-            // THEORY: qi_next needs to be different from p1 or p2
-
+            // Not considering vertical edges
             if (candidate_edge.dx() == 0)
             {
                 continue;
             }
 
+            // 2) Does the interior of the polygon lie below/above the line
+            // The interior is below iff the next point ccw order is below the edge
+
+            // Doesn't work
             if (is_upper && (candidate_edge.dy() / candidate_edge.dx()) < 0)
             {
                 continue;
@@ -207,63 +208,6 @@ void ConstantWorkSpace::pokreniAlgoritam()
 
         find_biding_edge(qi_index, &ea_initialized, &eA, true, &eA_start_index);
         find_biding_edge(qi_index, &eb_initialized, &eB, false, &eB_start_index);
-
-        // for (auto i = 0; i < polygon.size(); i++)
-        // {
-        //     auto p1_index = i;
-        //     auto p2_index = (i + 1) % N;
-        //     auto p1 = polygon[p1_index];
-        //     auto p2 = polygon[p2_index];
-
-        //     auto edge_left_x = std::min(p1.x(), p2.x());
-        //     auto edge_right_x = std::max(p1.x(), p2.x());
-        //     auto edge_down_y = std::min(p1.y(), p2.y());
-        //     auto edge_up_y = std::max(p1.y(), p2.y());
-
-        //     auto eA_up_y = std::max(eA.p1().y(), eA.p2().y());
-        //     auto eB_down_y = std::min(eB.p1().y(), eB.p2().y());
-
-        //     auto has_endpoint_to_the_right = edge_right_x > qi.x();
-
-        //     auto has_endpoint_to_the_up = edge_up_y > qi.y();
-        //     auto has_endpoint_to_the_down = edge_down_y < qi.y();
-
-        //     auto candidate_edge = QLineF(p1, p2);
-
-        //     auto is_incident_edge = qi_index == p1_index || qi_index == p2_index;
-
-        //     QPointF intersection_point;
-        //     auto intersection_indicator = ray.intersect(candidate_edge, &intersection_point);
-
-        //     auto has_intersection = intersection_indicator != QLineF::IntersectType::NoIntersection && edge_left_x <= intersection_point.x() && intersection_point.x() <= edge_right_x;
-
-        //     float intersect_y = intersection_point.y();
-
-        //     auto should_consider_for_ea = has_intersection && intersect_y >= qi.y() && has_endpoint_to_the_right; /* && has_endpoint_to_the_up;*/
-        //     auto should_consider_for_eb = has_intersection && intersect_y <= qi.y() && has_endpoint_to_the_right; /*&& has_endpoint_to_the_down; */
-
-        //     //  Handle initial cases (bcz im lazy as fukkkkk)
-        //     if (should_consider_for_ea)
-        //     {
-
-        //         if (intersection_point.y() < eA_intersect_point.y() || (intersection_point.y() == eA_intersect_point.y() && edge_up_y < eA_up_y || !ea_initialized))
-        //         {
-        //             ea_initialized = true;
-        //             eA_intersect_point = QPointF(intersection_point);
-        //             eA = candidate_edge;
-        //         }
-        //     }
-
-        //     if (should_consider_for_eb)
-        //     {
-        //         if (intersection_point.y() > eB_intersect_point.y() || (intersection_point.y() == eB_intersect_point.y() && edge_down_y > eB_down_y || !eb_initialized))
-        //         {
-        //             eb_initialized = true;
-        //             eB_intersect_point = QPointF(intersection_point);
-        //             eB = candidate_edge;
-        //         }
-        //     }
-        // }
 
         if (ea_initialized && eb_initialized)
         {
@@ -426,7 +370,6 @@ void ConstantWorkSpace::crtajAlgoritam(QPainter *painter) const
         painter->setPen(pen);
         painter->drawPoint(replacement_display);
     }
-
 }
 
 void ConstantWorkSpace::preparePoints()
