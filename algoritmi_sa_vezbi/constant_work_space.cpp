@@ -263,29 +263,38 @@ void ConstantWorkSpace::pokreniAlgoritam()
 
         if (ea_initialized && eb_initialized)
         {
-            std::cerr << "ea index" << eA_start_index << ", eb index " << eB_start_index << std::endl; 
             auto ea_right_point = eA.p1().x() > eA.p2().x() ? eA.p1() : eA.p2();
             auto eb_right_point = eB.p1().x() > eB.p2().x() ? eB.p1() : eB.p2();
 
             auto initial_r = ea_right_point.x() < eb_right_point.x() ? ea_right_point : eb_right_point;
+            auto initial_r_index = ea_right_point.x() < eb_right_point.x() ? eA_start_index : eB_start_index;
 
             auto initial_trapezoid = resolveTrapezoidPoints(qi, eA, eB, initial_r);
 
             bool replacement_initialized = false;
             QPointF replacement;
+            int replacement_index = initial_r_index;
 
-            for (auto inside_point: polygon) {
+            for (int k = 0; k < polygon.size(); k++) {
+                auto inside_point = polygon[k];
+                if (k == qi_index) {
+                    continue;
+                }                
+
                 if (!initial_trapezoid.containsPoint(inside_point, Qt::OddEvenFill)) {
                     continue;
                 }
 
                 if (!replacement_initialized || inside_point.x() < replacement.x()) {
                     replacement_initialized = true;
+                    replacement_index = k;
                     replacement = QPointF(inside_point);
                 }
             }
             auto new_r = replacement_initialized ? replacement : initial_r;
             auto final_trapezoid = resolveTrapezoidPoints(qi, eA, eB, new_r);
+
+            std::cerr << "for qi_index=" << qi_index << " we have trapezoid with ea= " << eA_start_index << " eb = " << eB_start_index << " and r = " << replacement_index << std::endl;
 
             trapezoids.push_back(final_trapezoid);
 
