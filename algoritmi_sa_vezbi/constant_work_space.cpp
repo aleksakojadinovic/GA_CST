@@ -65,6 +65,7 @@ void ConstantWorkSpace::find_biding_edge(int qi_index, bool *is_found, QLineF *e
 {
 
     float best_intersection_y = is_upper ? -100000 : 100000;
+    bool best_is_incident;
     QPointF point = polygon[qi_index];
 
     *is_found = false;
@@ -102,7 +103,9 @@ void ConstantWorkSpace::find_biding_edge(int qi_index, bool *is_found, QLineF *e
             continue;
         }
 
-        if (qi_index == i || qi_index == (i + 1) % polygon.size())
+        auto is_incident = qi_index == i || qi_index == (i + 1) % polygon.size();
+
+        if (is_incident)
         {
             // handle incident edge
 
@@ -180,12 +183,13 @@ void ConstantWorkSpace::find_biding_edge(int qi_index, bool *is_found, QLineF *e
 
         // Now we know this point should be considered
 
-        if (!(*is_found) || ((is_upper && intersection.y() < best_intersection_y) || (!is_upper && intersection.y() > best_intersection_y)))
+        if (!(*is_found) || (best_is_incident && !is_incident) || ((is_upper && intersection.y() < best_intersection_y) || (!is_upper && intersection.y() > best_intersection_y)))
         {
             *is_found = true;
             *edge = candidate_edge;
             best_intersection_y = intersection.y();
             *edge_start_index = i;
+            best_is_incident = is_incident;
         }
     }
 }
