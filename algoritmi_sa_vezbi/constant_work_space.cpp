@@ -17,7 +17,7 @@ ConstantWorkSpace::ConstantWorkSpace(QWidget *qw,
     {
         readFromFile(fileName);
     }
-    preparePoints();
+    // preparePoints();
     colors.push_back(Qt::red);
     colors.push_back(Qt::green);
     colors.push_back(Qt::blue);
@@ -65,7 +65,7 @@ void ConstantWorkSpace::find_biding_edge(int qi_index, bool *is_found, QLineF *e
 {
 
     float best_intersection_y = is_upper ? -100000 : 100000;
-    bool best_is_incident;
+    bool best_is_incident = false;
     QPointF point = polygon[qi_index];
 
     *is_found = false;
@@ -249,6 +249,10 @@ void ConstantWorkSpace::pokreniAlgoritam()
 
         if (ea_initialized && eb_initialized)
         {
+            ea_initialized_display = true;
+            eb_initialized_display = true;
+            eA_display = eA;
+            eB_display = eB;
             auto ea_right_point = eA.p1().x() > eA.p2().x() ? eA.p1() : eA.p2();
             auto eb_right_point = eB.p1().x() > eB.p2().x() ? eB.p1() : eB.p2();
 
@@ -281,11 +285,19 @@ void ConstantWorkSpace::pokreniAlgoritam()
                     replacement = QPointF(inside_point);
                 }
             }
+
+            if (replacement_initialized) {
+                std::cerr << "Replacing...." << std::endl;
+            }
+
             auto new_r = replacement_initialized ? replacement : initial_r;
             auto final_trapezoid = resolveTrapezoidPoints(qi, eA, eB, new_r);
 
 
             trapezoids.push_back(final_trapezoid);
+        }else{
+            ea_initialized_display = false;
+            eb_initialized_display = false;
         }
 
         // qi_ray_display = ray;
@@ -302,6 +314,8 @@ void ConstantWorkSpace::pokreniAlgoritam()
 
 void ConstantWorkSpace::crtajAlgoritam(QPainter *painter) const
 {
+    
+
     const auto N = polygon.size();
     auto pen = painter->pen();
 
@@ -390,7 +404,7 @@ void ConstantWorkSpace::crtajAlgoritam(QPainter *painter) const
         auto color = colors[i & colors.size()];
         QBrush b(QColor(color.red(), color.green(), color.blue(), 122));
         pen.setColor(Qt::black);
-        pen.setWidth(5);
+        pen.setWidth(3);
         pen.setStyle(Qt::DashLine);
         painter->setPen(pen);
         painter->setBrush(b);
