@@ -110,7 +110,6 @@ void MainWindow::on_Nasumicni_dugme_clicked()
     _imeDatoteke = "";
     if (ui->brojNasumicniTacaka->text() != "")
         _brojSlucajnihObjekata = ui->brojNasumicniTacaka->text().toInt();
-    std::cerr << "bice guzve" << std::endl;
     napraviNoviAlgoritam();
     ui->Zapocni_dugme->setEnabled(true);
     ui->Ispocetka_dugme->setEnabled(false);
@@ -284,7 +283,6 @@ void MainWindow::napraviNoviAlgoritam()
        2D algoritmi crtaju po _pOblastCrtanja, a 3D po _pOblastCrtanjaOpenGL. */
     
     TipAlgoritma tipAlgoritma = static_cast<TipAlgoritma>(ui->tipAlgoritma->currentIndex());
-    std::cerr << "Tip algoritma je" << ui->tipAlgoritma->currentIndex() << std::endl;
     switch (tipAlgoritma)
     {
     case TipAlgoritma::DEMO_ISCRTAVANJA:

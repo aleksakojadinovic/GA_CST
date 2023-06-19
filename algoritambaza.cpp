@@ -114,7 +114,6 @@ std::vector<QPoint> AlgoritamBaza::generisiNasumicneTacke(int brojTacaka) const
     int xDiff = xMax - xMin;
     int yDiff = yMax - yMin;
 
-    std::cerr << "xmax" << xMax << "ymax" << yMax << "xmin" << xMin << "ymin" << yMin << std::endl;
 
     for (int i = 0; i < brojTacaka; i++)
         randomPoints.emplace_back(xMin + rand() % xDiff, yMin + rand() % yDiff);

@@ -131,8 +131,8 @@ void ConstantWorkSpace::find_biding_edge(int qi_index, bool *is_found, QLineF *e
             auto is_horizontal = edge_p1.y() == edge_p2.y();
 
             if (is_horizontal) {
-                auto goes_left = edge_p2.x() > edge_p1.x();
-                auto goes_right = edge_p2.x() < edge_p1.x();
+                auto goes_right = edge_p2.x() > edge_p1.x();
+                auto goes_left = edge_p2.x() < edge_p1.x();
 
                 if (is_upper && !goes_left) {
                     continue;
@@ -196,11 +196,6 @@ void ConstantWorkSpace::find_biding_edge(int qi_index, bool *is_found, QLineF *e
 
 void ConstantWorkSpace::pokreniAlgoritam()
 {
-    // for (auto i = 0; i < polygon.size(); i++)
-    // {
-    //     auto p = polygon[i];
-    //     std::cerr << i << " --> " << p.x() << ", " << p.y() << std::endl;
-    // }
     updateAnimation();
 
     QPointF qi_minus_1;
@@ -214,7 +209,6 @@ void ConstantWorkSpace::pokreniAlgoritam()
 
         if (p_index == 0)
         {
-            // qi is the leftmost point in the set (which is the first because that's how we sorted them)
             qi = polygon[0];
             qi_index = 0;
         }
@@ -290,7 +284,6 @@ void ConstantWorkSpace::pokreniAlgoritam()
             auto new_r = replacement_initialized ? replacement : initial_r;
             auto final_trapezoid = resolveTrapezoidPoints(qi, eA, eB, new_r);
 
-            std::cerr << "for qi_index=" << qi_index << " we have trapezoid with ea= " << eA_start_index << " eb = " << eB_start_index << " and r = " << replacement_index << std::endl;
 
             trapezoids.push_back(final_trapezoid);
         }
@@ -370,7 +363,6 @@ void ConstantWorkSpace::crtajAlgoritam(QPainter *painter) const
 
     
 
-    // std::cerr << "drawing ea from " << ptos(eA.p1()) << " to " << ptos(eA.p2()) << std::endl;
     if (ea_initialized_display && eb_initialized_display)
     {
         // Draw eA
@@ -410,7 +402,6 @@ void ConstantWorkSpace::crtajAlgoritam(QPainter *painter) const
     // Draw replacement point
     if (replacement_display_visible)
     {
-        // std::cerr << "no replacement here" << std::endl;
         pen.setColor(Qt::gray);
         pen.setWidth(15);
         painter->setPen(pen);
@@ -422,7 +413,6 @@ void ConstantWorkSpace::preparePoints()
 {
     auto min_point = polygon[0];
 
-    std::cerr << polygon.size() << std::endl;
 
     for (auto i = 1ul; i < polygon.size(); i++)
     {
@@ -445,7 +435,6 @@ bool ConstantWorkSpace::findEdgeAbove(int pointIndex, int *result)
 
     QLineF ray = QLineF(QPointF(q.x(), q.y() - 1000), QPointF(q.x(), q.y() + 200));
 
-    std::cerr << "Finding edge above for point p" << pointIndex << " = " << ptos(q) << std::endl;
 }
 std::string ConstantWorkSpace::ptos(QPointF p)
 {

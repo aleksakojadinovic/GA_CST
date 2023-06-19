@@ -38,7 +38,6 @@ public:
         {
             polygon.push_back(QPointF(x, y));
         };
-        std::cerr << polygon.size() << std::endl;
     }
 
     void preparePoints();
