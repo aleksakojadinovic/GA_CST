@@ -51,6 +51,8 @@ public:
     std::string ptos(QPointF p);
     bool getBindingEdges(const std::vector<QPointF> &polygon, const QPointF &point, QLineF *upperEdge, QLineF *lowerEdge);
 
+    void find_biding_edge(int qi_index, bool * is_found, QLineF * edge, bool is_upper, int * edge_start_index);
+
 private:
     std::vector<QPointF> polygon;
     std::vector<QPolygonF> trapezoids;
