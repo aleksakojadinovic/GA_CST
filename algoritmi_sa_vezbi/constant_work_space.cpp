@@ -64,11 +64,6 @@ bool ConstantWorkSpace::isInteriorBelowLine(QLineF line)
 void ConstantWorkSpace::find_biding_edge(int qi_index, bool *is_found, QLineF *edge, bool is_upper, int *edge_start_index)
 {
 
-    auto orientation = [](QPointF p, QPointF q, QPointF r)
-    {
-        return (q.y() - p.y()) * (r.x() - q.x()) - (q.x() - p.x()) * (r.y() - q.y());
-    };
-
     float best_intersection_y = is_upper ? -100000 : 100000;
     QPointF point = polygon[qi_index];
 
@@ -95,37 +90,82 @@ void ConstantWorkSpace::find_biding_edge(int qi_index, bool *is_found, QLineF *e
         }
 
         // handle incident edge
+        auto edge_max_right = std::max(edge_p1.x(), edge_p2.x());
+        if (edge_max_right <= point.x())
+        {
+            continue;
+        }
+
+        // Not considering vertical edges
+        if (candidate_edge.dx() == 0)
+        {
+            continue;
+        }
 
         if (qi_index == i || qi_index == (i + 1) % polygon.size())
         {
             // handle incident edge
 
             // 1) edge needs to have an endpoint to the right of qi
-            auto edge_max_right = std::max(edge_p1.x(), edge_p2.x());
-            if (edge_max_right <= point.x())
-            {
-                continue;
-            }
 
-            // Not considering vertical edges
-            if (candidate_edge.dx() == 0)
-            {
-                continue;
-            }
 
             // 2) Does the interior of the polygon lie below/above the line
             // The interior is below iff the next point ccw order is below the edge
 
-            // Doesn't work
-            if (is_upper && (candidate_edge.dy() / candidate_edge.dx()) < 0)
-            {
-                continue;
+            // THEORY: Interior lies above if and only if cross product of edge and its perpendicular vector is > 0
+
+            
+
+            bool can_be_upper_edge = false;
+            bool can_be_lower_edge = false;
+
+            auto goes_up = edge_p2.y() > edge_p1.y();
+            auto goes_down = edge_p2.y() < edge_p1.y();
+
+            
+
+
+            auto is_horizontal = edge_p1.y() == edge_p2.y();
+
+            if (is_horizontal) {
+                auto goes_left = edge_p2.x() > edge_p1.x();
+                auto goes_right = edge_p2.x() < edge_p1.x();
+
+                if (is_upper && !goes_left) {
+                    continue;
+                }
+
+                if (!is_upper & !goes_right) {
+                    continue;
+                }
+            }else{
+
+                auto slope = candidate_edge.dy() / candidate_edge.dx();
+                can_be_upper_edge = (slope < 0 && goes_up) || (slope > 0 && goes_down);
+                can_be_lower_edge = (slope < 0 && goes_down) || (slope > 0 && goes_up);
+
+                if (is_upper && !can_be_upper_edge) {
+                    continue;
+                }
+
+                if (!is_upper && !can_be_lower_edge) {
+                    continue;
+                }
+
             }
 
-            if (!is_upper && (candidate_edge.dy() / candidate_edge.dx()) > 0)
-            {
-                continue;
-            }
+            
+
+            // Doesn't work
+            // if (is_upper && (candidate_edge.dy() / candidate_edge.dx()) < 0)
+            // {
+            //     continue;
+            // }
+
+            // if (!is_upper && (candidate_edge.dy() / candidate_edge.dx()) > 0)
+            // {
+            //     continue;
+            // }
             // auto qi_next_index = (qi_index + 1) % polygon.size();
 
             // auto o = orientation(edge_p1, edge_p2, polygon[qi_next_index]);
@@ -324,17 +364,27 @@ void ConstantWorkSpace::crtajAlgoritam(QPainter *painter) const
     painter->setPen(pen);
     painter->drawLine(qi_ray_display);
 
-    // Draw eA
+    
 
     // std::cerr << "drawing ea from " << ptos(eA.p1()) << " to " << ptos(eA.p2()) << std::endl;
-    if (ea_initialized_display)
+    if (ea_initialized_display && eb_initialized_display)
     {
+        // Draw eA
         pen.setColor(Qt::yellow);
         pen.setWidth(5);
         pen.setStyle(Qt::SolidLine);
         painter->setPen(pen);
         painter->drawLine(eA_display);
+
+
+        // Draw eB
+        pen.setColor(Qt::cyan);
+        pen.setWidth(5);
+        pen.setStyle(Qt::SolidLine);
+        painter->setPen(pen);
+        painter->drawLine(eB_display);
     }
+
 
     // Draw trapezoids
     for (auto i = 0; i < trapezoids.size(); i++)
@@ -351,15 +401,7 @@ void ConstantWorkSpace::crtajAlgoritam(QPainter *painter) const
         painter->drawPolygon(t);
     }
 
-    // Draw eB
-    if (eb_initialized_display)
-    {
-        pen.setColor(Qt::cyan);
-        pen.setWidth(5);
-        pen.setStyle(Qt::SolidLine);
-        painter->setPen(pen);
-        painter->drawLine(eB_display);
-    }
+
 
     // Draw replacement point
     if (replacement_display_visible)
